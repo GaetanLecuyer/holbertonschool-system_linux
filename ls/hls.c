@@ -3,11 +3,12 @@
 #include <dirent.h>
 
 #define INITIAL_CAPACITY 10
+#define MAX_NAME_LENGTH 256
 
 /* Structure pour stocker les entrées */
 typedef struct
 {
-    char **entries;
+    char *entries[INITIAL_CAPACITY];
     int count;
     int capacity;
 } EntryList;
@@ -15,9 +16,8 @@ typedef struct
 /* Initialiser la liste d'entrées */
 void initializeList(EntryList *list)
 {
-    list->entries = NULL;
     list->count = 0;
-    list->capacity = 0;
+    list->capacity = INITIAL_CAPACITY;
 }
 
 /* Ajouter une entrée à la liste */
@@ -27,13 +27,12 @@ void addEntry(EntryList *list, const char *name)
 
     if (list->count == list->capacity)
     {
-        /* Si la capacité est atteinte, doubler la taille du tableau */
-        list->capacity = (list->capacity == 0) ? INITIAL_CAPACITY : list->capacity * 2;
-        list->entries = (char **)realloc(list->entries, list->capacity * sizeof(char *));
+        fprintf(stderr, "Error: Maximum capacity reached\n");
+        exit(EXIT_FAILURE);
     }
 
     /* Allouer de la mémoire pour le nouveau nom */
-    list->entries[list->count] = (char *)malloc(256);
+    list->entries[list->count] = (char *)malloc(MAX_NAME_LENGTH);
     while (name[i] != '\0')
     {
         list->entries[list->count][i] = name[i];
@@ -53,7 +52,6 @@ void freeEntries(EntryList *list)
     {
         free(list->entries[i]);
     }
-    free(list->entries);
 }
 
 /**
@@ -99,7 +97,7 @@ int main(void)
         for (j = 0; j < entries.count - i - 1; j++)
         {
             int x = 0, y = 0, z = 0;
-            char temp[256];
+            char temp[MAX_NAME_LENGTH];
 
             while (entries.entries[j][x] != '\0' && entries.entries[j + 1][y] != '\0')
             {
