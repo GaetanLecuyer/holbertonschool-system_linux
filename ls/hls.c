@@ -18,7 +18,7 @@ int main(void)
     DIR *dir;
     struct dirent *entry;
     char **entries = NULL;
-    int count = 0;
+    int count, i = 0;
 
     /* Open the current directory */
     dir = opendir(".");
@@ -48,7 +48,7 @@ int main(void)
     qsort(entries, count, sizeof(char *), compare);
 
     /* Print the sorted entries */
-    for (int i = 0; i < count; i++)
+    for (i = 0; i < count; i++)
     {
         printf("%s\n", entries[i]);
         free(entries[i]); 
