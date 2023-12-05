@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <dirent.h>
+#include <string.h>
 
 /**
  * main - Entry point
@@ -21,16 +22,17 @@ int main(void)
         return (1);
     }
 
-    /* Traverse the directory and print the name of each file/folder */
+    /* Traverse the directory and print the name of each visible file/folder */
     while ((entry = readdir(dir)) != NULL)
     {
-        printf("%s  ", entry->d_name);
+        if (entry->d_name[0] != '.') // Ignore hidden files and directories
+        {
+            printf("%s\n", entry->d_name);
+        }
     }
 
     /* Close the directory */
     closedir(dir);
-
-    printf("\n");
 
     return (0);
 }
