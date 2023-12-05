@@ -197,7 +197,6 @@ int main(int argc, char *argv[])
             {
                 if (S_ISDIR(path_stat.st_mode))
                 {
-                    printf("%s:\n", argv[i]);
                     listDirectory(argv[i]);
                 }
                 else
