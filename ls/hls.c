@@ -54,6 +54,12 @@ void freeEntries(EntryList *list)
     }
 }
 
+/* Comparer deux chaînes de caractères */
+int compareStrings(const void *a, const void *b)
+{
+    return strcmp(*(const char **)a, *(const char **)b);
+}
+
 /**
  * main - Entry point
  *
@@ -64,7 +70,7 @@ int main(void)
     DIR *dir;
     struct dirent *entry;
     EntryList entries;
-    int i, j;
+    int i;
 
     /* Initialiser la liste d'entrées */
     initializeList(&entries);
@@ -91,50 +97,8 @@ int main(void)
     /* Close the directory */
     closedir(dir);
 
-    /* Bubble Sort the entries (simple sorting algorithm) */
-    for (i = 0; i < entries.count - 1; i++)
-    {
-        for (j = 0; j < entries.count - i - 1; j++)
-        {
-            int x = 0, y = 0, z = 0;
-            char temp[MAX_NAME_LENGTH];
-
-            while (entries.entries[j][x] != '\0' && entries.entries[j + 1][y] != '\0')
-            {
-                if (entries.entries[j][x] < entries.entries[j + 1][y])
-                {
-                    temp[x + y] = entries.entries[j][x];
-                    x++;
-                }
-                else
-                {
-                    temp[x + y] = entries.entries[j + 1][y];
-                    y++;
-                }
-            }
-
-            while (entries.entries[j][x] != '\0')
-            {
-                temp[x + y] = entries.entries[j][x];
-                x++;
-            }
-
-            while (entries.entries[j + 1][y] != '\0')
-            {
-                temp[x + y] = entries.entries[j + 1][y];
-                y++;
-            }
-
-            temp[x + y] = '\0';
-
-            while (temp[z] != '\0')
-            {
-                entries.entries[j][z] = temp[z];
-                z++;
-            }
-            entries.entries[j][z] = '\0';
-        }
-    }
+    /* Use qsort for sorting the entries */
+    qsort(entries.entries, entries.count, sizeof(char *), compareStrings);
 
     /* Print the sorted entries */
     for (i = 0; i < entries.count; i++)
