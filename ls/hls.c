@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <pwd.h>
+#include <grp.h>
+#include <errno.h>
 
 #define INITIAL_CAPACITY 10
 #define MAX_NAME_LENGTH 256
@@ -99,15 +105,11 @@ int compareEntries(const char *a, const char *b)
     else if (*a != '\0' && *b == '\0')
         return 1;
 
-    return 0;
+    return 0; // Les chaînes sont égales
 }
 
-/**
- * main - Entry point
- *
- * Return: Always 0 (Success)
- */
-int main(void)
+/* Fonction pour afficher le contenu d'un répertoire */
+void listDirectory(const char *path)
 {
     DIR *dir;
     struct dirent *entry;
@@ -117,17 +119,17 @@ int main(void)
     /* Initialiser la liste d'entrées */
     initializeList(&entries);
 
-    /* Open the current directory */
-    dir = opendir(".");
+    /* Ouvrir le répertoire spécifié */
+    dir = opendir(path);
 
-    /* Check if opening the directory was successful */
+    /* Vérifier si l'ouverture du répertoire a réussi */
     if (dir == NULL)
     {
         perror("Error opening directory");
         exit(EXIT_FAILURE);
     }
 
-    /* Traverse the directory and store the names of each visible file/folder */
+    /* Parcourir le répertoire et stocker les noms de chaque fichier/dossier visible */
     while ((entry = readdir(dir)) != NULL)
     {
         if (entry->d_name[0] != '.')
@@ -136,7 +138,7 @@ int main(void)
         }
     }
 
-    /* Close the directory */
+    /* Fermer le répertoire */
     closedir(dir);
 
     /* Trier les entrées par tri à bulles */
@@ -150,6 +152,41 @@ int main(void)
 
     /* Libérer la mémoire allouée pour les entrées */
     freeEntries(&entries);
+}
+
+int main(int argc, char *argv[])
+{
+    int i;
+
+    if (argc < 2)
+    {
+        listDirectory(".");
+    }
+    else
+    {
+        for (i = 1; i < argc; i++)
+        {
+            struct stat path_stat;
+
+            if (lstat(argv[i], &path_stat) == -1)
+            {
+                fprintf(stderr, "%s: cannot access %s: ", argv[0], argv[i]);
+                perror("");
+            }
+            else
+            {
+                if (S_ISDIR(path_stat.st_mode))
+                {
+                    printf("%s:\n", argv[i]);
+                    listDirectory(argv[i]);
+                }
+                else
+                {
+                    printf("%s\n", argv[i]);
+                }
+            }
+        }
+    }
 
     return EXIT_SUCCESS;
 }
