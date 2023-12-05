@@ -47,7 +47,7 @@ int compareEntries(const char *a, const char *b)
 {
     while (*a != '\0' && *b != '\0')
     {
-        char charA = (*a >= 'A' && *a <= 'Z') ? (*a + 32) : *a; // Convertir en minuscule si nécessaire
+        char charA = (*a >= 'A' && *a <= 'Z') ? (*a + 32) : *a;
         char charB = (*b >= 'A' && *b <= 'Z') ? (*b + 32) : *b;
 
         if (charA < charB)
@@ -59,12 +59,12 @@ int compareEntries(const char *a, const char *b)
         b++;
     }
 
-    if (*a == '\0' && *b != '\0') // a est plus court que b, donc a < b
+    if (*a == '\0' && *b != '\0')
         return -1;
-    else if (*a != '\0' && *b == '\0') // a est plus long que b, donc a > b
+    else if (*a != '\0' && *b == '\0')
         return 1;
 
-    return 0; // Les chaînes sont égales
+    return 0;
 }
 
 /* Initialiser la liste d'entrées */
@@ -181,19 +181,16 @@ int main(int argc, char *argv[])
 
     if (argc < 2)
     {
-        // Pas d'arguments, lister le répertoire courant
         listDirectory(".");
     }
     else
     {
-        // Lister chaque répertoire ou fichier spécifié en argument
         for (i = 1; i < argc; i++)
         {
             struct stat path_stat;
 
             if (lstat(argv[i], &path_stat) == -1)
             {
-                // Gérer les erreurs d'accès au répertoire ou au fichier
                 fprintf(stderr, "%s: cannot access %s: ", argv[0], argv[i]);
                 perror("");
             }
@@ -201,13 +198,11 @@ int main(int argc, char *argv[])
             {
                 if (S_ISDIR(path_stat.st_mode))
                 {
-                    // Le chemin spécifié est un répertoire, afficher le contenu du répertoire
                     printf("%s:\n", argv[i]);
                     listDirectory(argv[i]);
                 }
                 else
                 {
-                    // Le chemin spécifié est un fichier, afficher le nom du fichier
                     printf("%s\n", argv[i]);
                 }
             }
