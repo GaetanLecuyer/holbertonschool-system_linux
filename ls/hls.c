@@ -145,8 +145,9 @@ void listDirectory(const char *path)
     /* Vérifier si l'ouverture du répertoire a réussi */
     if (dir == NULL)
     {
-        fprintf(stderr, "%s: cannot open directory %s: %s\n", __FILE__, path, strerror(errno));
-        return;
+        fprintf(stderr, "%s: ", argv[0]);
+        perror("cannot open directory");
+        exit(EXIT_FAILURE);
     }
 
     /* Parcourir le répertoire et stocker les noms de chaque fichier/dossier visible */
@@ -164,7 +165,8 @@ void listDirectory(const char *path)
     /* Trier les entrées par tri à bulles */
     bubbleSort(&entries);
 
-    /* Imprimer les entrées triées */
+    /* Afficher les entrées triées */
+    printf("%s:\n", path);
     for (i = 0; i < entries.count; i++)
     {
         printf("%s\n", entries.entries[i]);
@@ -174,37 +176,23 @@ void listDirectory(const char *path)
     freeEntries(&entries);
 }
 
-/* Fonction principale */
 int main(int argc, char *argv[])
 {
     int i;
 
-    if (argc < 2)
+    /* Si aucun argument n'est fourni, lister le répertoire actuel */
+    if (argc == 1)
     {
         listDirectory(".");
     }
     else
     {
+        /* Pour chaque argument, lister le répertoire spécifié */
         for (i = 1; i < argc; i++)
         {
-            struct stat path_stat;
-
-            if (lstat(argv[i], &path_stat) == -1)
-            {
-                fprintf(stderr, "%s: cannot access %s: %s\n", argv[0], argv[i], strerror(errno));
-            }
-            else
-            {
-                if (S_ISDIR(path_stat.st_mode))
-                {
-                    printf("%s:\n", argv[i]);
-                    listDirectory(argv[i]);
-                }
-                else
-                {
-                    printf("%s\n", argv[i]);
-                }
-            }
+            listDirectory(argv[i]);
+            if (i < argc - 1)
+                printf("\n");
         }
     }
 
