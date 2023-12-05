@@ -38,7 +38,7 @@ void bubbleSort(EntryList *list);
 int compareEntries(const char *a, const char *b);
 
 /* Fonction pour afficher le contenu d'un répertoire */
-void listDirectory(const char *path);
+void listDirectory(const char *programName, const char *path);
 
 int main(int argc, char *argv[]);
 
@@ -129,7 +129,7 @@ void bubbleSort(EntryList *list)
 }
 
 /* Fonction pour afficher le contenu d'un répertoire */
-void listDirectory(const char *path)
+void listDirectory(const char *programName, const char *path)
 {
     DIR *dir;
     struct dirent *entry;
@@ -145,7 +145,7 @@ void listDirectory(const char *path)
     /* Vérifier si l'ouverture du répertoire a réussi */
     if (dir == NULL)
     {
-        fprintf(stderr, "%s: ", argv[0]);
+        fprintf(stderr, "%s: ", programName);
         perror("cannot open directory");
         exit(EXIT_FAILURE);
     }
@@ -176,6 +176,7 @@ void listDirectory(const char *path)
     freeEntries(&entries);
 }
 
+/* Fonction principale */
 int main(int argc, char *argv[])
 {
     int i;
@@ -183,14 +184,14 @@ int main(int argc, char *argv[])
     /* Si aucun argument n'est fourni, lister le répertoire actuel */
     if (argc == 1)
     {
-        listDirectory(".");
+        listDirectory(argv[0], ".");
     }
     else
     {
         /* Pour chaque argument, lister le répertoire spécifié */
         for (i = 1; i < argc; i++)
         {
-            listDirectory(argv[i]);
+            listDirectory(argv[0], argv[i]);
             if (i < argc - 1)
                 printf("\n");
         }
