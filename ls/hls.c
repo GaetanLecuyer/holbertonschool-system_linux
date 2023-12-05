@@ -80,13 +80,18 @@ void bubbleSort(EntryList *list)
 /* Fonction pour comparer deux chaînes sans utiliser strcmp */
 int compareEntries(const char *a, const char *b)
 {
-    while (*a != '\0' && *b != '\0' && *a == *b)
+    while (*a != '\0' && *b != '\0')
     {
+        if (*a < *b)
+            return -1;
+        else if (*a > *b)
+            return 1;
+
         a++;
         b++;
     }
 
-    return (*a > *b) - (*a < *b);
+    return 0;
 }
 
 /**
