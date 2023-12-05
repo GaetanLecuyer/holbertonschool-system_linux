@@ -13,6 +13,9 @@ typedef struct
     int capacity;
 } EntryList;
 
+/* Fonction pour comparer deux chaînes sans utiliser strcmp */
+int compareStrings(const char *a, const char *b);
+
 /* Initialiser la liste d'entrées */
 void initializeList(EntryList *list)
 {
@@ -54,7 +57,7 @@ void freeEntries(EntryList *list)
     }
 }
 
-/* Trier les entrées par tri par insertion */
+/* Trier les entrées par tri par insertion sans utiliser strcmp */
 void insertionSort(EntryList *list)
 {
     int i, j;
@@ -65,7 +68,7 @@ void insertionSort(EntryList *list)
         key = list->entries[i];
         j = i - 1;
 
-        while (j >= 0 && strcmp(list->entries[j], key) > 0)
+        while (j >= 0 && compareStrings(list->entries[j], key) > 0)
         {
             list->entries[j + 1] = list->entries[j];
             j = j - 1;
@@ -73,6 +76,18 @@ void insertionSort(EntryList *list)
 
         list->entries[j + 1] = key;
     }
+}
+
+/* Fonction pour comparer deux chaînes sans utiliser strcmp */
+int compareStrings(const char *a, const char *b)
+{
+    while (*a != '\0' && *b != '\0' && *a == *b)
+    {
+        a++;
+        b++;
+    }
+
+    return (*a > *b) - (*a < *b);
 }
 
 /**
