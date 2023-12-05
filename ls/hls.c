@@ -3,24 +3,50 @@
 #include <dirent.h>
 #include <string.h>
 
-/* Fonction pour ajouter une entrée à la liste */
-void addEntry(char ***entries, int *count, const char *name)
+#define INITIAL_CAPACITY 10
+
+/* Structure pour stocker les entrées */
+typedef struct
 {
-    (*entries) = realloc((*entries), ((*count) + 1) * sizeof(char *));
-    (*entries)[(*count)] = strdup(name);
-    (*count)++;
+    char **entries;
+    int count;
+    int capacity;
+} EntryList;
+
+/* Initialiser la liste d'entrées */
+void initializeList(EntryList *list)
+{
+    list->entries = (char **)malloc(INITIAL_CAPACITY * sizeof(char *));
+    list->count = 0;
+    list->capacity = INITIAL_CAPACITY;
 }
 
-/* Fonction pour libérer la mémoire allouée pour les entrées */
-void freeEntries(char ***entries, int count)
+/* Ajouter une entrée à la liste */
+void addEntry(EntryList *list, const char *name)
+{
+    if (list->count == list->capacity)
+    {
+        /* Si la capacité est atteinte, doubler la taille du tableau */
+        list->capacity *= 2;
+        list->entries = (char **)realloc(list->entries, list->capacity * sizeof(char *));
+    }
+
+    /* Allouer de la mémoire pour le nouveau nom */
+    list->entries[list->count] = (char *)malloc(strlen(name) + 1);
+    strcpy(list->entries[list->count], name);
+    list->count++;
+}
+
+/* Libérer la mémoire allouée pour les entrées */
+void freeEntries(EntryList *list)
 {
     int i;
-    
-    for (i = 0; i < count; i++)
+
+    for (i = 0; i < list->count; i++)
     {
-        free((*entries)[i]);
+        free(list->entries[i]);
     }
-    free(*entries);
+    free(list->entries);
 }
 
 /**
@@ -32,9 +58,11 @@ int main(void)
 {
     DIR *dir;
     struct dirent *entry;
-    char **entries = NULL;
-    int count = 0;
+    EntryList entries;
     int i, j;
+
+    /* Initialiser la liste d'entrées */
+    initializeList(&entries);
 
     /* Open the current directory */
     dir = opendir(".");
@@ -51,7 +79,7 @@ int main(void)
     {
         if (entry->d_name[0] != '.')
         {
-            addEntry(&entries, &count, entry->d_name);
+            addEntry(&entries, entry->d_name);
         }
     }
 
@@ -59,27 +87,27 @@ int main(void)
     closedir(dir);
 
     /* Bubble Sort the entries (simple sorting algorithm) */
-    for (i = 0; i < count - 1; i++)
+    for (i = 0; i < entries.count - 1; i++)
     {
-        for (j = 0; j < count - i - 1; j++)
+        for (j = 0; j < entries.count - i - 1; j++)
         {
-            if (strcmp(entries[j], entries[j + 1]) > 0)
+            if (strcmp(entries.entries[j], entries.entries[j + 1]) > 0)
             {
-                char *temp = entries[j];
-                entries[j] = entries[j + 1];
-                entries[j + 1] = temp;
+                char *temp = entries.entries[j];
+                entries.entries[j] = entries.entries[j + 1];
+                entries.entries[j + 1] = temp;
             }
         }
     }
 
     /* Print the sorted entries */
-    for (i = 0; i < count; i++)
+    for (i = 0; i < entries.count; i++)
     {
-        printf("%s\n", entries[i]);
+        printf("%s\n", entries.entries[i]);
     }
 
     /* Free the array of entries */
-    freeEntries(&entries, count);
+    freeEntries(&entries);
 
-    return (EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }
