@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
-#include <string.h>
 
 #define INITIAL_CAPACITY 10
 
@@ -24,6 +23,8 @@ void initializeList(EntryList *list)
 /* Ajouter une entrée à la liste */
 void addEntry(EntryList *list, const char *name)
 {
+    int i = 0;
+
     if (list->count == list->capacity)
     {
         /* Si la capacité est atteinte, doubler la taille du tableau */
@@ -32,8 +33,14 @@ void addEntry(EntryList *list, const char *name)
     }
 
     /* Allouer de la mémoire pour le nouveau nom */
-    list->entries[list->count] = (char *)malloc(strlen(name) + 1);
-    strcpy(list->entries[list->count], name);
+    list->entries[list->count] = (char *)malloc(256);
+    while (name[i] != '\0')
+    {
+        list->entries[list->count][i] = name[i];
+        i++;
+    }
+    list->entries[list->count][i] = '\0';
+
     list->count++;
 }
 
@@ -60,6 +67,8 @@ int main(void)
     struct dirent *entry;
     EntryList entries;
     int i, j;
+    int x = 0, y = 0;
+    int z = 0;
 
     /* Initialiser la liste d'entrées */
     initializeList(&entries);
@@ -91,12 +100,42 @@ int main(void)
     {
         for (j = 0; j < entries.count - i - 1; j++)
         {
-            if (strcmp(entries.entries[j], entries.entries[j + 1]) > 0)
+            char temp[256];
+            while (entries.entries[j][x] != '\0' && entries.entries[j + 1][y] != '\0')
             {
-                char *temp = entries.entries[j];
-                entries.entries[j] = entries.entries[j + 1];
-                entries.entries[j + 1] = temp;
+                if (entries.entries[j][x] < entries.entries[j + 1][y])
+                {
+                    temp[x + y] = entries.entries[j][x];
+                    x++;
+                }
+                else
+                {
+                    temp[x + y] = entries.entries[j + 1][y];
+                    y++;
+                }
             }
+
+            while (entries.entries[j][x] != '\0')
+            {
+                temp[x + y] = entries.entries[j][x];
+                x++;
+            }
+
+            while (entries.entries[j + 1][y] != '\0')
+            {
+                temp[x + y] = entries.entries[j + 1][y];
+                y++;
+            }
+
+            temp[x + y] = '\0';
+
+            // Copier le résultat trié dans la première entrée
+            while (temp[z] != '\0')
+            {
+                entries.entries[j][z] = temp[z];
+                z++;
+            }
+            entries.entries[j][z] = '\0';
         }
     }
 
