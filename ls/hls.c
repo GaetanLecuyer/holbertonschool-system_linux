@@ -25,7 +25,7 @@ int main(void)
     /* Traverse the directory and print the name of each visible file/folder */
     while ((entry = readdir(dir)) != NULL)
     {
-        if (entry->d_name[0] != '.') // Ignore hidden files and directories
+        if (entry->d_name[0] != '.')
         {
             printf("%s\n", entry->d_name);
         }
