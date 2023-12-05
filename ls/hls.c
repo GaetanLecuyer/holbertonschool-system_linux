@@ -129,7 +129,6 @@ int main(void)
 
             temp[x + y] = '\0';
 
-            // Copier le résultat trié dans la première entrée
             while (temp[z] != '\0')
             {
                 entries.entries[j][z] = temp[z];
