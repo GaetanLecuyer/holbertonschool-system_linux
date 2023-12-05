@@ -134,6 +134,7 @@ void listDirectory(const char *programName, const char *path)
     DIR *dir;
     struct dirent *entry;
     EntryList entries;
+    int i;
 
     /* Initialiser la liste d'entrées */
     initializeList(&entries);
@@ -167,7 +168,7 @@ void listDirectory(const char *programName, const char *path)
 
     /* Imprimer les entrées triées */
     printf("%s:\n", path);
-    for (int i = 0; i < entries.count; i++)
+    for (i = 0; i < entries.count; i++)
     {
         printf("%s\n", entries.entries[i]);
         struct stat st;
