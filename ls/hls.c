@@ -14,7 +14,9 @@ void addEntry(char ***entries, int *count, const char *name)
 /* Fonction pour libérer la mémoire allouée pour les entrées */
 void freeEntries(char ***entries, int count)
 {
-    for (int i = 0; i < count; i++)
+    int i;
+    
+    for (i = 0; i < count; i++)
     {
         free((*entries)[i]);
     }
@@ -47,7 +49,7 @@ int main(void)
     /* Traverse the directory and store the names of each visible file/folder */
     while ((entry = readdir(dir)) != NULL)
     {
-        if (entry->d_name[0] != '.') // Ignore hidden files and directories
+        if (entry->d_name[0] != '.')
         {
             addEntry(&entries, &count, entry->d_name);
         }
