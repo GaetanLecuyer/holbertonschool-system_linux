@@ -15,9 +15,9 @@ typedef struct
 /* Initialiser la liste d'entrées */
 void initializeList(EntryList *list)
 {
-    list->entries = (char **)malloc(INITIAL_CAPACITY * sizeof(char *));
+    list->entries = NULL;
     list->count = 0;
-    list->capacity = INITIAL_CAPACITY;
+    list->capacity = 0;
 }
 
 /* Ajouter une entrée à la liste */
@@ -28,7 +28,7 @@ void addEntry(EntryList *list, const char *name)
     if (list->count == list->capacity)
     {
         /* Si la capacité est atteinte, doubler la taille du tableau */
-        list->capacity *= 2;
+        list->capacity = (list->capacity == 0) ? INITIAL_CAPACITY : list->capacity * 2;
         list->entries = (char **)realloc(list->entries, list->capacity * sizeof(char *));
     }
 
@@ -67,8 +67,6 @@ int main(void)
     struct dirent *entry;
     EntryList entries;
     int i, j;
-    int x = 0, y = 0;
-    int z = 0;
 
     /* Initialiser la liste d'entrées */
     initializeList(&entries);
@@ -100,7 +98,9 @@ int main(void)
     {
         for (j = 0; j < entries.count - i - 1; j++)
         {
+            int x = 0, y = 0, z = 0;
             char temp[256];
+
             while (entries.entries[j][x] != '\0' && entries.entries[j + 1][y] != '\0')
             {
                 if (entries.entries[j][x] < entries.entries[j + 1][y])
