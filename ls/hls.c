@@ -3,10 +3,22 @@
 #include <dirent.h>
 #include <string.h>
 
-/* Fonction de comparaison pour le tri */
-int compare(const void *a, const void *b)
+/* Fonction pour ajouter une entrée à la liste */
+void addEntry(char ***entries, int *count, const char *name)
 {
-    return strcmp(*(const char **)a, *(const char **)b);
+    (*entries) = realloc((*entries), ((*count) + 1) * sizeof(char *));
+    (*entries)[(*count)] = strdup(name);
+    (*count)++;
+}
+
+/* Fonction pour libérer la mémoire allouée pour les entrées */
+void freeEntries(char ***entries, int count)
+{
+    for (int i = 0; i < count; i++)
+    {
+        free((*entries)[i]);
+    }
+    free(*entries);
 }
 
 /**
@@ -20,7 +32,7 @@ int main(void)
     struct dirent *entry;
     char **entries = NULL;
     int count = 0;
-    int i;
+    int i, j;
 
     /* Open the current directory */
     dir = opendir(".");
@@ -35,30 +47,37 @@ int main(void)
     /* Traverse the directory and store the names of each visible file/folder */
     while ((entry = readdir(dir)) != NULL)
     {
-        if (entry->d_name[0] != '.')
+        if (entry->d_name[0] != '.') // Ignore hidden files and directories
         {
-            entries = realloc(entries, (count + 1) * sizeof(char *));
-            entries[count] = strdup(entry->d_name);
-            count++;
+            addEntry(&entries, &count, entry->d_name);
         }
     }
 
     /* Close the directory */
     closedir(dir);
 
-    /* Sort the entries */
-    qsort(entries, count, sizeof(char *), compare);
+    /* Bubble Sort the entries (simple sorting algorithm) */
+    for (i = 0; i < count - 1; i++)
+    {
+        for (j = 0; j < count - i - 1; j++)
+        {
+            if (strcmp(entries[j], entries[j + 1]) > 0)
+            {
+                char *temp = entries[j];
+                entries[j] = entries[j + 1];
+                entries[j + 1] = temp;
+            }
+        }
+    }
 
     /* Print the sorted entries */
     for (i = 0; i < count; i++)
     {
         printf("%s\n", entries[i]);
-        free(entries[i]);
     }
 
     /* Free the array of entries */
-    free(entries);
+    freeEntries(&entries, count);
 
     return (EXIT_SUCCESS);
 }
-
