@@ -14,7 +14,7 @@ typedef struct
 } EntryList;
 
 /* Fonction pour comparer deux chaînes sans utiliser strcmp */
-int compareStrings(const char *a, const char *b);
+int compareEntries(const char *a, const char *b);
 
 /* Initialiser la liste d'entrées */
 void initializeList(EntryList *list)
@@ -57,29 +57,28 @@ void freeEntries(EntryList *list)
     }
 }
 
-/* Trier les entrées par tri par insertion sans utiliser strcmp */
-void insertionSort(EntryList *list)
+/* Trier les entrées par tri à bulles sans utiliser strcmp */
+void bubbleSort(EntryList *list)
 {
     int i, j;
-    char *key;
+    char *temp;
 
-    for (i = 1; i < list->count; i++)
+    for (i = 0; i < list->count - 1; i++)
     {
-        key = list->entries[i];
-        j = i - 1;
-
-        while (j >= 0 && compareStrings(list->entries[j], key) > 0)
+        for (j = 0; j < list->count - i - 1; j++)
         {
-            list->entries[j + 1] = list->entries[j];
-            j = j - 1;
+            if (compareEntries(list->entries[j], list->entries[j + 1]) > 0)
+            {
+                temp = list->entries[j];
+                list->entries[j] = list->entries[j + 1];
+                list->entries[j + 1] = temp;
+            }
         }
-
-        list->entries[j + 1] = key;
     }
 }
 
 /* Fonction pour comparer deux chaînes sans utiliser strcmp */
-int compareStrings(const char *a, const char *b)
+int compareEntries(const char *a, const char *b)
 {
     while (*a != '\0' && *b != '\0' && *a == *b)
     {
@@ -127,8 +126,8 @@ int main(void)
     /* Close the directory */
     closedir(dir);
 
-    /* Trier les entrées par tri par insertion */
-    insertionSort(&entries);
+    /* Trier les entrées par tri à bulles */
+    bubbleSort(&entries);
 
     /* Imprimer les entrées triées */
     for (i = 0; i < entries.count; i++)
