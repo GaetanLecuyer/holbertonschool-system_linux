@@ -38,7 +38,7 @@ void bubbleSort(EntryList *list);
 int compareEntries(const char *a, const char *b);
 
 /* Fonction pour afficher le contenu d'un répertoire */
-void listDirectory(const char *programName, const char *path);
+void listDirectory(const char *path);
 
 int main(int argc, char *argv[]);
 
@@ -129,7 +129,7 @@ void bubbleSort(EntryList *list)
 }
 
 /* Fonction pour afficher le contenu d'un répertoire */
-void listDirectory(const char *programName, const char *path)
+void listDirectory(const char *path)
 {
     DIR *dir;
     struct dirent *entry;
@@ -145,9 +145,8 @@ void listDirectory(const char *programName, const char *path)
     /* Vérifier si l'ouverture du répertoire a réussi */
     if (dir == NULL)
     {
-        fprintf(stderr, "%s: ", programName);
-        perror("cannot open directory");
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "%s: cannot open directory %s: %s\n", __FILE__, path, strerror(errno));
+        return;
     }
 
     /* Parcourir le répertoire et stocker les noms de chaque fichier/dossier visible */
@@ -165,8 +164,7 @@ void listDirectory(const char *programName, const char *path)
     /* Trier les entrées par tri à bulles */
     bubbleSort(&entries);
 
-    /* Afficher les entrées triées */
-    printf("%s:\n", path);
+    /* Imprimer les entrées triées */
     for (i = 0; i < entries.count; i++)
     {
         printf("%s\n", entries.entries[i]);
@@ -181,19 +179,32 @@ int main(int argc, char *argv[])
 {
     int i;
 
-    /* Si aucun argument n'est fourni, lister le répertoire actuel */
-    if (argc == 1)
+    if (argc < 2)
     {
-        listDirectory(argv[0], ".");
+        listDirectory(".");
     }
     else
     {
-        /* Pour chaque argument, lister le répertoire spécifié */
         for (i = 1; i < argc; i++)
         {
-            listDirectory(argv[0], argv[i]);
-            if (i < argc - 1)
-                printf("\n");
+            struct stat path_stat;
+
+            if (lstat(argv[i], &path_stat) == -1)
+            {
+                fprintf(stderr, "%s: cannot access %s: %s\n", argv[0], argv[i], strerror(errno));
+            }
+            else
+            {
+                if (S_ISDIR(path_stat.st_mode))
+                {
+                    printf("%s:\n", argv[i]);
+                    listDirectory(argv[i]);
+                }
+                else
+                {
+                    printf("%s\n", argv[i]);
+                }
+            }
         }
     }
 
