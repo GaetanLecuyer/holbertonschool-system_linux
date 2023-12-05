@@ -64,7 +64,7 @@ int compareEntries(const char *a, const char *b)
     else if (*a != '\0' && *b == '\0')
         return 1;
 
-    return 0;
+    return 0; // Les chaînes sont égales
 }
 
 /* Initialiser la liste d'entrées */
@@ -145,8 +145,8 @@ void listDirectory(const char *path)
     /* Vérifier si l'ouverture du répertoire a réussi */
     if (dir == NULL)
     {
-        perror("Error opening directory");
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "%s: cannot open directory %s: %s\n", __FILE__, path, strerror(errno));
+        return;
     }
 
     /* Parcourir le répertoire et stocker les noms de chaque fichier/dossier visible */
@@ -191,8 +191,7 @@ int main(int argc, char *argv[])
 
             if (lstat(argv[i], &path_stat) == -1)
             {
-                fprintf(stderr, "%s: cannot access %s: ", argv[0], argv[i]);
-                perror("");
+                fprintf(stderr, "%s: cannot access %s: %s\n", argv[0], argv[i], strerror(errno));
             }
             else
             {
