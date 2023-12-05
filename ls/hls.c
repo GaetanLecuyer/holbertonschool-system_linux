@@ -105,8 +105,7 @@ int compareEntries(const char *a, const char *b)
     else if (*a != '\0' && *b == '\0')
         return 1;
 
-    return 0; // Les chaînes sont égales
-}
+    return 0;
 
 /* Fonction pour afficher le contenu d'un répertoire */
 void listDirectory(const char *path)
