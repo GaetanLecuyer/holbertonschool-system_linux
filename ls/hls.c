@@ -82,7 +82,7 @@ int compareEntries(const char *a, const char *b)
 {
     while (*a != '\0' && *b != '\0')
     {
-        char charA = (*a >= 'A' && *a <= 'Z') ? (*a + 32) : *a; // Convertir en minuscule si nécessaire
+        char charA = (*a >= 'A' && *a <= 'Z') ? (*a + 32) : *a;
         char charB = (*b >= 'A' && *b <= 'Z') ? (*b + 32) : *b;
 
         if (charA < charB)
@@ -99,7 +99,7 @@ int compareEntries(const char *a, const char *b)
     else if (*a != '\0' && *b == '\0') // a est plus long que b, donc a > b
         return 1;
 
-    return 0; // Les chaînes sont égales
+    return 0;
 }
 
 /**
