@@ -4,7 +4,8 @@
 #include <string.h>
 
 /* Fonction de comparaison pour le tri */
-int compare(const void *a, const void *b) {
+int compare(const void *a, const void *b)
+{
     return strcmp(*(const char **)a, *(const char **)b);
 }
 
@@ -18,7 +19,7 @@ int main(void)
     DIR *dir;
     struct dirent *entry;
     char **entries = NULL;
-    int count, i = 0;
+    int count = 0;
 
     /* Open the current directory */
     dir = opendir(".");
@@ -27,7 +28,7 @@ int main(void)
     if (dir == NULL)
     {
         perror("Error opening directory");
-        return (1);
+        exit(EXIT_FAILURE);
     }
 
     /* Traverse the directory and store the names of each visible file/folder */
@@ -48,15 +49,15 @@ int main(void)
     qsort(entries, count, sizeof(char *), compare);
 
     /* Print the sorted entries */
-    for (i = 0; i < count; i++)
+    for (int i = 0; i < count; i++)
     {
         printf("%s\n", entries[i]);
-        free(entries[i]); 
+        free(entries[i]);
     }
 
     /* Free the array of entries */
     free(entries);
 
-    return (0);
+    return (EXIT_SUCCESS);
 }
 
