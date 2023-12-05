@@ -54,22 +54,25 @@ void freeEntries(EntryList *list)
     }
 }
 
-/* Comparer deux chaînes de caractères sans utiliser strcmp */
-int compareStrings(const char *a, const char *b)
+/* Trier les entrées par tri par insertion */
+void insertionSort(EntryList *list)
 {
-    while (*a != '\0' && *b != '\0' && *a == *b)
+    int i, j;
+    char *key;
+
+    for (i = 1; i < list->count; i++)
     {
-        a++;
-        b++;
+        key = list->entries[i];
+        j = i - 1;
+
+        while (j >= 0 && strcmp(list->entries[j], key) > 0)
+        {
+            list->entries[j + 1] = list->entries[j];
+            j = j - 1;
+        }
+
+        list->entries[j + 1] = key;
     }
-
-    return (*a > *b) - (*a < *b);
-}
-
-/* Fonction de comparaison pour qsort */
-int compareEntries(const void *a, const void *b)
-{
-    return compareStrings(*(const char **)a, *(const char **)b);
 }
 
 /**
@@ -109,8 +112,8 @@ int main(void)
     /* Close the directory */
     closedir(dir);
 
-    /* Utiliser qsort pour trier les entrées */
-    qsort(entries.entries, entries.count, sizeof(char *), compareEntries);
+    /* Trier les entrées par tri par insertion */
+    insertionSort(&entries);
 
     /* Imprimer les entrées triées */
     for (i = 0; i < entries.count; i++)
