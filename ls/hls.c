@@ -129,12 +129,11 @@ void bubbleSort(EntryList *list)
 }
 
 /* Fonction pour afficher le contenu d'un répertoire */
-void listDirectory(const char *path)
+void listDirectory(const char *programName, const char *path)
 {
     DIR *dir;
     struct dirent *entry;
     EntryList entries;
-    int i;
 
     /* Initialiser la liste d'entrées */
     initializeList(&entries);
@@ -145,7 +144,7 @@ void listDirectory(const char *path)
     /* Vérifier si l'ouverture du répertoire a réussi */
     if (dir == NULL)
     {
-        fprintf(stderr, "%s: cannot open directory %s: %s\n", __FILE__, path, strerror(errno));
+        fprintf(stderr, "%s: cannot open directory %s: %s\n", programName, path, strerror(errno));
         return;
     }
 
@@ -154,7 +153,9 @@ void listDirectory(const char *path)
     {
         if (entry->d_name[0] != '.')
         {
-            addEntry(&entries, entry->d_name);
+            char entryPath[MAX_NAME_LENGTH];
+            snprintf(entryPath, sizeof(entryPath), "%s/%s", path, entry->d_name);
+            addEntry(&entries, entryPath);
         }
     }
 
@@ -165,26 +166,33 @@ void listDirectory(const char *path)
     bubbleSort(&entries);
 
     /* Imprimer les entrées triées */
-    for (i = 0; i < entries.count; i++)
+    printf("%s:\n", path);
+    for (int i = 0; i < entries.count; i++)
     {
         printf("%s\n", entries.entries[i]);
+        struct stat st;
+        if (lstat(entries.entries[i], &st) == 0 && S_ISDIR(st.st_mode))
+        {
+            listDirectory(programName, entries.entries[i]);
+        }
     }
 
     /* Libérer la mémoire allouée pour les entrées */
     freeEntries(&entries);
 }
-
 /* Fonction principale */
 int main(int argc, char *argv[])
 {
     int i;
 
+    /* Si aucun argument n'est fourni, lister le répertoire actuel */
     if (argc < 2)
     {
-        listDirectory(".");
+        listDirectory(argv[0], ".");
     }
     else
     {
+        /* Pour chaque argument, vérifier s'il s'agit d'un répertoire ou d'un fichier */
         for (i = 1; i < argc; i++)
         {
             struct stat path_stat;
@@ -195,9 +203,10 @@ int main(int argc, char *argv[])
             }
             else
             {
+                /* Si c'est un répertoire, lister son contenu, sinon imprimer le nom du fichier */
                 if (S_ISDIR(path_stat.st_mode))
                 {
-                    listDirectory(argv[i]);
+                    listDirectory(argv[0], argv[i]);
                 }
                 else
                 {
