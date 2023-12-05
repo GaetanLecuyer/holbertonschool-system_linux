@@ -54,10 +54,22 @@ void freeEntries(EntryList *list)
     }
 }
 
-/* Comparer deux chaînes de caractères */
-int compareStrings(const void *a, const void *b)
+/* Comparer deux chaînes de caractères sans utiliser strcmp */
+int compareStrings(const char *a, const char *b)
 {
-    return strcmp(*(const char **)a, *(const char **)b);
+    while (*a != '\0' && *b != '\0' && *a == *b)
+    {
+        a++;
+        b++;
+    }
+
+    return (*a > *b) - (*a < *b);
+}
+
+/* Fonction de comparaison pour qsort */
+int compareEntries(const void *a, const void *b)
+{
+    return compareStrings(*(const char **)a, *(const char **)b);
 }
 
 /**
@@ -97,16 +109,16 @@ int main(void)
     /* Close the directory */
     closedir(dir);
 
-    /* Use qsort for sorting the entries */
-    qsort(entries.entries, entries.count, sizeof(char *), compareStrings);
+    /* Utiliser qsort pour trier les entrées */
+    qsort(entries.entries, entries.count, sizeof(char *), compareEntries);
 
-    /* Print the sorted entries */
+    /* Imprimer les entrées triées */
     for (i = 0; i < entries.count; i++)
     {
         printf("%s\n", entries.entries[i]);
     }
 
-    /* Free the array of entries */
+    /* Libérer la mémoire allouée pour les entrées */
     freeEntries(&entries);
 
     return EXIT_SUCCESS;
