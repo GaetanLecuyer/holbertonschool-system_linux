@@ -1,4 +1,3 @@
-// entry_operations.h
 #ifndef ENTRY_OPERATIONS_H
 #define ENTRY_OPERATIONS_H
 
@@ -19,4 +18,4 @@ void freeEntries(EntryList *list);
 void bubbleSort(EntryList *list);
 int compareEntries(const char *a, const char *b);
 
-#endif // ENTRY_OPERATIONS_H
+#endif

@@ -17,4 +17,4 @@
 
 void listDirectory(const char *path);
 
-#endif // DIRECTORY_OPERATIONS_H
+#endif
