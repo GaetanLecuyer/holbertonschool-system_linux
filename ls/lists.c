@@ -1,0 +1,122 @@
+#include "lists.h"
+
+/**
+ * add_node - adds a node to the start of the list
+ * @head: address of pointer to head node
+ * @file: file field of node
+ *
+ * Return: size of list
+ */
+list_t *add_node(list_t **head, File *file)
+{
+	list_t *new_head = malloc(sizeof(list_t));
+
+	if (!head || !new_head)
+	{
+		return (NULL);
+	}
+	if (file)
+	{
+		new_head->file = *file;
+		new_head->file.name = _strdup(new_head->file.name);
+	}
+
+	new_head->next = *head;
+	*head = new_head;
+	return (new_head);
+}
+
+
+/**
+ * add_node_end - adds a node to the end of the list
+ * @head: address of pointer to head node
+ * @file: file field of node
+ *
+ * Return: size of list
+ */
+list_t *add_node_end(list_t **head, File *file)
+{
+	list_t *new_node = malloc(sizeof(list_t));
+	list_t *node = *head;
+
+	if (!head || !new_node)
+		return (NULL);
+	_memset(new_node, 0, sizeof(*new_node));
+	if (file)
+	{
+		new_node->file = *file;
+		new_node->file.name = _strdup(new_node->file.name);
+	}
+	if (node)
+	{
+		while (node->next)
+			node = node->next;
+		node->next = new_node;
+	}
+	else
+		*head = new_node;
+	return (new_node);
+}
+
+/**
+ * free_list - frees all nodes of a list
+ * @head: pointer to head node
+ *
+ * Return: void
+ */
+void free_list(list_t *head)
+{
+	list_t *node, *next_node;
+
+	if (!head)
+		return;
+
+	node = head;
+	while (node)
+	{
+		next_node = node->next;
+		free(node);
+		node = next_node;
+	}
+}
+
+/**
+ * print_list - prints a linked lists
+ * @h: pointer to first node
+ *
+ * Return: size of list
+ */
+size_t print_list(const list_t *h)
+{
+	size_t i = 0;
+
+	while (h)
+	{
+		printf("[%s]\n", h->file.name);
+		h = h->next;
+		i++;
+	}
+	return (i);
+}
+
+
+/**
+ * pop_list - pops head node of list
+ * @head: address of pointer to first node
+ *
+ * Return: value of popped node
+ */
+char *pop_list(list_t **head)
+{
+	list_t *node;
+	char *name;
+
+	if (!head || !*head)
+		return (0);
+
+	node = (*head)->next;
+	name = (*head)->file.name;
+	free(*head);
+	*head = node;
+	return (name);
+}
