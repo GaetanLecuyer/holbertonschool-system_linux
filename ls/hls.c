@@ -19,9 +19,6 @@ typedef struct
     int capacity;
 } EntryList;
 
-/* Fonction pour comparer deux chaînes sans utiliser strcmp */
-int compareEntries(const char *a, const char *b);
-
 /* Initialiser la liste d'entrées */
 void initializeList(EntryList *list);
 
@@ -31,15 +28,16 @@ void addEntry(EntryList *list, const char *name);
 /* Libérer la mémoire allouée pour les entrées */
 void freeEntries(EntryList *list);
 
-/* Trier les entrées par tri à bulles sans utiliser strcmp */
-void bubbleSort(EntryList *list);
-
 /* Fonction pour comparer deux chaînes sans utiliser strcmp */
 int compareEntries(const char *a, const char *b);
+
+/* Trier les entrées par tri à bulles sans utiliser strcmp */
+void bubbleSort(EntryList *list);
 
 /* Fonction pour afficher le contenu d'un répertoire */
 void listDirectory(const char *path);
 
+/* Fonction principale */
 int main(int argc, char *argv[]);
 
 /* Fonction pour comparer deux chaînes sans utiliser strcmp */
@@ -129,7 +127,7 @@ void bubbleSort(EntryList *list)
 }
 
 /* Fonction pour afficher le contenu d'un répertoire */
-void listDirectory(const char *programName, const char *path)
+void listDirectory(const char *path)
 {
     DIR *dir;
     struct dirent *entry;
@@ -145,7 +143,7 @@ void listDirectory(const char *programName, const char *path)
     /* Vérifier si l'ouverture du répertoire a réussi */
     if (dir == NULL)
     {
-        fprintf(stderr, "%s: cannot open directory %s: %s\n", programName, path, strerror(errno));
+        fprintf(stderr, "%s: cannot open directory %s: %s\n", __FILE__, path, strerror(errno));
         return;
     }
 
@@ -154,9 +152,7 @@ void listDirectory(const char *programName, const char *path)
     {
         if (entry->d_name[0] != '.')
         {
-            char entryPath[MAX_NAME_LENGTH];
-            snprintf(entryPath, sizeof(entryPath), "%s/%s", path, entry->d_name);
-            addEntry(&entries, entryPath);
+            addEntry(&entries, entry->d_name);
         }
     }
 
@@ -167,33 +163,26 @@ void listDirectory(const char *programName, const char *path)
     bubbleSort(&entries);
 
     /* Imprimer les entrées triées */
-    printf("%s:\n", path);
     for (i = 0; i < entries.count; i++)
     {
         printf("%s\n", entries.entries[i]);
-        struct stat st;
-        if (lstat(entries.entries[i], &st) == 0 && S_ISDIR(st.st_mode))
-        {
-            listDirectory(programName, entries.entries[i]);
-        }
     }
 
     /* Libérer la mémoire allouée pour les entrées */
     freeEntries(&entries);
 }
+
 /* Fonction principale */
 int main(int argc, char *argv[])
 {
     int i;
 
-    /* Si aucun argument n'est fourni, lister le répertoire actuel */
     if (argc < 2)
     {
-        listDirectory(argv[0], ".");
+        listDirectory(".");
     }
     else
     {
-        /* Pour chaque argument, vérifier s'il s'agit d'un répertoire ou d'un fichier */
         for (i = 1; i < argc; i++)
         {
             struct stat path_stat;
@@ -204,10 +193,9 @@ int main(int argc, char *argv[])
             }
             else
             {
-                /* Si c'est un répertoire, lister son contenu, sinon imprimer le nom du fichier */
                 if (S_ISDIR(path_stat.st_mode))
                 {
-                    listDirectory(argv[0], argv[i]);
+                    listDirectory(argv[i]);
                 }
                 else
                 {
