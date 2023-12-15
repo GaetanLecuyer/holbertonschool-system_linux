@@ -38,5 +38,7 @@ char *read_buf(FdBuf *fb);
 FdBuf *get_fdbuf(FdBuf *head, const int fd);
 char *_strchr(char *s, char c, ssize_t size);
 void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
+char *__getline(const int fd);
+char *__strchr(char *s, char c, ssize_t size)
 
 #endif
