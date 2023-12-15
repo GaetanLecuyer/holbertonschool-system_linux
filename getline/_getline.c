@@ -1,5 +1,8 @@
 #include "_getline.h"
 
+
+char *__strchr(char *s, char c, ssize_t size);
+
 /**
  * __getline - gets a line of chars from a file descriptor
  * @fd: the file descriptor to read
