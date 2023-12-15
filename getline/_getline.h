@@ -1,44 +1,54 @@
-#ifndef GETLINE_H
-#define GETLINE_H
+#ifndef _GETLINE_H
+#define _GETLINE_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+/* read, write req */
 #include <unistd.h>
+/* malloc, free req */
+#include <stdlib.h>
+/* strcpy, strncpy, strcat, strdup, memset, memcpy req */
+#include <string.h>
+/* for flags */
+#include <stdbool.h>
 
-#define DO_DEBUG 0
+/* perror() not allowed, for testing only (errno could be handled internally */
+#include <stdio.h>
+#include <errno.h>
 
-#if DO_DEBUG
-#define DEBUG(x) (x)
-#else
-#define DEBUG(x) ((void)0)
-#endif
-
-/**
- * struct fd - holds an open file descriptor buffer
- * @fd: the integer file descriptor
- * @buf: pointer to the char buffer
- * @i: current index in the buf
- * @len: current length of the buf
- * @next: next node in linked list
- */
-typedef struct fd
-{
-    int fd;
-    char *buf;
-    size_t i;
-    size_t len;
-    struct fd *next;
-} FdBuf;
-
+/* macros */
 #define READ_SIZE 1024
 
-char *_getline(const int fd);
-char *read_buf(FdBuf *fb);
-FdBuf *get_fdbuf(FdBuf *head, const int fd);
-char *_strchr(char *s, char c, ssize_t size);
-void *_realloc(void *ptr, unsigned int old_size, unsigned int new_size);
-char *__getline(const int fd);
-char *__strchr(char *s, char c, ssize_t size)
+/* structs */
+/**
+ * struct fd_profile_s - node in a singly linked list of fd profiles
+ *
+ * @fd: file descriptor to read
+ * @read_buf: buffer of READ_SIZE bytes to read into
+ * @line_start: starting index of next \n delimited line
+ * @next: pointer to next node in list
+ */
+typedef struct fd_profile_s
+{
+	int fd;
+	char *read_buf;
+	size_t line_start;
+	struct fd_profile_s *next;
+} fd_profile_t;
 
-#endif
+/* functions */
+/* (up to 5 helpers allowed to _getline() */
+
+void free_profiles(fd_profile_t **head);
+
+fd_profile_t *add_profile(fd_profile_t  **head, int fd);
+
+char *buff_load(int fd, char *read_buf, size_t line_start, bool *EOF_reached);
+
+char *copy_line(char *read_buf, size_t *line_start,
+		bool *overflow, bool EOF_reached);
+
+char *join_line(char **unfinished_line, char **new_line,
+		size_t unfinished_line_len, size_t line_len);
+
+char *_getline(const int fd);
+
+#endif /* _GETLINE_H */
