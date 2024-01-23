@@ -1,52 +1,66 @@
 #!/usr/bin/python3
-"""Finds & overwrites a string in a process' mem file"""
+""" replaces a string in the heap memory of a running process
 
+    Usage: ./read_write_heap.py <pid> <target> <replacement>
+
+    where <pid> is a pid, <target> is a string to search for in the heap, and
+    <replacement> replaces target.
+"""
+
+from re import findall
 from sys import argv
 
-USAGE = "USAGE: read_write_heap.py pid search_string replace_string"
 
+def read_write_heap(pid, target, replacement):
+    """ finds and replaces target string in heap of a running process"""
 
-def parse_maps_file(pid):
-    """parses /proc/PID/maps file for heap info"""
-    heap_start = heap_stop = None
     try:
-        with open("/proc/{:d}/maps".format(pid), "r") as file:
-            for line in file:
-                if line.endswith("[heap]\n"):
-                    heap_start, heap_stop = \
-                        [int(x, 16) for x in line.split(" ")[0].split("-")]
-    except Exception as e:
-        print(e) or exit(1)
-    if not heap_start or not heap_stop:
-        print("[ERROR] Heap address not found.") or exit(1)
-    print("[*] Heap starts at {:02X}".format(heap_start))
-    return heap_start, heap_stop
+        with open('/proc/{}/maps'.format(pid), 'r') as maps_file:
+            address_map = maps_file.read()
+            maps_file.close()
+    except FileNotFoundError as e:
+        error_out('{} does not represent a running process.\n'.format(pid))
+
+    pattern = r'\b([\da-zA-Z]+)-([\da-zA-Z]+).*?\[heap]'
+    # re.findall() returns a list of tuples of the captured groups
+    heap_ranges = findall(pattern, address_map)
+    with open('/proc/{}/mem'.format(pid), 'r+b', 0) as mem_file:
+
+        for heap_range in heap_ranges:
+            start = int(heap_range[0], 16)
+            end = int(heap_range[1], 16)
+            mem_file.seek(start)
+            buffer = mem_file.read(end - start)
+            target_location = buffer.find(target)
+
+            if target_location != -1:
+                mem_file.seek(start + target_location)
+                difference = max(len(target) - len(replacement), 0)
+                mem_file.write(replacement + bytes(difference))
+
+        mem_file.close()
 
 
-def update_mem_file(pid, search_string, replace_string, heap_start, heap_stop):
-    """finds search_string in /proc/PID/mem and writes replace_string"""
+def error_out(error_msg):
+    """ prints error message and exits with error code 1 """
+    print(error_msg)
+    exit(1)
+
+
+if __name__ == '__main__':
+
+    if len(argv) != 4:
+        error_out('Usage: {} pid target_str replacement_str\n'.format(argv[0]))
+
     try:
-        with open("/proc/{:d}/mem".format(pid), "r+b") as f:
-            f.seek(heap_start)
-            data = f.read(heap_stop - heap_start)
-            print("[*] Read {:d} bytes".format(heap_stop - heap_start))
-            string_offset = data.find(search_string.encode())
-            if string_offset > -1:
-                print("[*] String found at {:02X}"
-                      .format(heap_start + string_offset))
-                f.seek(heap_start + string_offset)
-                written = f.write(replace_string.encode() + b'\x00')
-                print("[*] {:d} bytes written!".format(written))
-            else:
-                print(
-                    "[ERROR] String '{:s}' not found in heap."
-                    .format(search_string))
-                exit(1)
-    except Exception as e:
-        print(e) or exit(1)
+        pid = int(argv[1])
+    except ValueError:
+        error_out('{}: first arg must be valid proccess id\n'.format(argv[0]))
 
-if __name__ == "__main__":
-    if len(argv) < 4 or len(argv[2]) < len(argv[3]):
-        print(USAGE) or exit(1)
-    heap_start, heap_stop = parse_maps_file(int(argv[1]))
-    update_mem_file(int(argv[1]), argv[2], argv[3], heap_start, heap_stop)
+    target = bytes(argv[2], 'ascii')
+    replacement = bytes(argv[3], 'ascii')
+
+    # Let's do this!
+    read_write_heap(pid, target, replacement)
+    print('Complete.')
+    exit(0)
