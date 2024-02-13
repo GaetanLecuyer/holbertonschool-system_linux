@@ -13,22 +13,25 @@ asm_strcmp:
     ; Boucle de comparaison des caractères
     cmp_loop:
         ; Charger le caractère de la première chaîne dans al
-        mov al, [rdi + rcx]
+        mov al, [rdi]
         ; Charger le caractère de la deuxième chaîne dans bl
-        mov bl, [rsi + rcx]
-        ; Comparer les caractères
+        mov bl, [rsi]
+        ; Test pour savoir si le caractère de la première chaîne est nul
+        test al, al
+        jz cmp_done  ; Si le caractère de la première chaîne est nul, terminer la comparaison
+        ; Comparer les caractères 
         cmp al, bl
         ; Si les caractères sont différents, terminer la comparaison
         jne cmp_done
-        ; Si les deux caractères sont nuls, terminer la comparaison
-        test al, al
-        jz cmp_done
+        ; Incrémenter les pointeurs et continuer la boucle
+        inc rdi
+        inc rsi
         ; Incrémenter le compteur et continuer la boucle
         inc rcx
         jmp cmp_loop
 
     cmp_done:
-        ; Soustraire les caractères pour obtenir le résultat
-        sub al, bl
+        ; Soustraire les pointeurs pour obtenir la longueur de la différence
+        sub rax, rcx
         ; Retourner le résultat
         ret
