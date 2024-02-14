@@ -17,11 +17,10 @@ asm_strcmp:
         ; Charger le caractère de la deuxième chaîne dans bl
         mov bl, [rsi]
         ; Test pour savoir si le caractère de la première chaîne est nul
-        test al, al
+        test al, bl
         jz cmp_done  ; Si le caractère de la première chaîne est nul, terminer la comparaison
         ; Comparer les caractères 
         cmp al, bl
-        ; Si les caractères sont différents, terminer la comparaison
         jne cmp_done
         ; Incrémenter les pointeurs et continuer la boucle
         inc rdi
