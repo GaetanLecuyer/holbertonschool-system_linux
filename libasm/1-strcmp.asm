@@ -1,36 +1,36 @@
 section .text
-    global asm_strcmp
+global asm_strcmp
 
 asm_strcmp:
-    ; Arguments:
-    ;   rdi: pointeur vers la première chaîne
-    ;   rsi: pointeur vers la deuxième chaîne
+    ; Input parameters:
+    ;   rdi: pointer to the first string (s1)
+    ;   rsi: pointer to the second string (s2)
+    ; Output:
+    ;   rax: result (0 if equal, positive if s1 > s2, negative if s1 < s2)
 
-    ; Initialisation des registres
-    xor rax, rax  ; rax: résultat
-    xor rcx, rcx  ; rcx: compteur pour boucle
+    ; Initialize counters
+    xor rax, rax   ; rax will store the result
 
-    ; Boucle de comparaison des caractères
+    ; Compare strings character by character
     cmp_loop:
-        ; Charger le caractère de la première chaîne dans al
-        mov al, [rdi]
-        ; Charger le caractère de la deuxième chaîne dans bl
-        mov bl, [rsi]
-        ; Test pour savoir si le caractère de la première chaîne est nul
-        test al, bl
-        jz cmp_done  ; Si le caractère de la première chaîne est nul, terminer la comparaison
-        ; Comparer les caractères 
+        ; Load characters from strings
+        mov al, [rdi]   ; load a character from s1 into al
+        mov bl, [rsi]   ; load a character from s2 into bl
+
+        ; Compare characters
         cmp al, bl
-        jne cmp_done
-        ; Incrémenter les pointeurs et continuer la boucle
+        jne end_cmp_loop  ; jump to end_cmp_loop if characters are not equal
+
+        ; Check for null terminator
+        cmp al, 0
+        je  end_cmp_loop  ; jump to end_cmp_loop if null terminator is reached
+
+        ; Move to the next characters in the strings
         inc rdi
         inc rsi
-        ; Incrémenter le compteur et continuer la boucle
-        inc rcx
-        jmp cmp_loop
+        jmp cmp_loop     ; jump back to cmp_loop
 
-    cmp_done:
-        ; Soustraire les pointeurs pour obtenir la longueur de la différence
-        sub rax, rcx
-        ; Retourner le résultat
+    end_cmp_loop:
+        ; Calculate the result based on the characters
+        sub al, bl  ; subtract the characters
         ret
