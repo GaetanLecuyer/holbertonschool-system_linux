@@ -1,31 +1,22 @@
-section .text
-    global asm_strlen
+BITS 64
+	global asm_strlen
+
+	section .text
 
 asm_strlen:
-    ; Input: rdi - pointer to the input string
-    ; Output: rax - length of the string
+	push rbp
+	mov rbp, rsp
+	mov rax, 0
+	jmp loop_check
 
-    ; Initialize the counter to 0
-    xor rax, rax
+loop_body:
+	inc rax
+	inc rdi
 
-    ; Check if the string is NULL (empty)
-    test rdi, rdi
-    jz .end
+loop_check:
+	cmp byte [rdi], 0
+	jne loop_body
 
-    ; Loop to iterate through the string
-.loop:
-    ; Check if the current character is NULL (end of the string)
-    cmp byte [rdi], 0
-    je .end
-
-    ; Move to the next character
-    inc rdi
-
-    ; Increment the counter
-    inc rax
-
-    ; Continue the loop
-    jmp .loop
-
-.end:
-    ret
+	mov rsp, rbp
+	pop rbp
+	ret

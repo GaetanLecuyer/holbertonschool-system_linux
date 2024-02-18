@@ -1,27 +1,29 @@
 BITS 64
-	global asm_strcmp
+	global asm_strncmp
 	section .text
 
-asm_strcmp:
+asm_strncmp:
 	push rbp
 	mov rbp, rsp
-	push rdx
+	push rcx
 
 while:
 	mov rax, rdi
-	mov rdx, rsi
+	mov rcx, rsi
 	movzx eax, BYTE [rax]
-	movzx edx, BYTE [rdx]
+	movzx ecx, BYTE [rcx]
 	cmp al, 0x0
 	je after
-	cmp al, dl
+	cmp al, cl
 	jne after
 	inc rdi
 	inc rsi
+	dec edx
+	jz equal
 	jmp while
 
 after:
-	cmp al, dl
+	cmp al, cl
 	je equal
 	jl less
 	mov RAX, 0x1
@@ -34,7 +36,7 @@ less:
 	jmp end
 
 end:
-	pop rdx
+	pop rcx
 
 	mov rbp, rsp
 	pop rbp
